@@ -1,0 +1,83 @@
+####
+# ATENTION:
+# Replace all occurences of study-project with your project's name
+####
+
+# v2 syntax
+version: '2'
+
+# Named volumes
+volumes:
+  # Postgres Data
+  study-project-postgres-data:
+    driver: local
+
+  # MySQL Data
+  study-project-mysql-data:
+    driver: local
+
+  # Redis Data
+  study-project-redis-data:
+    driver: local
+
+services:
+  # Postgres (9.5)
+  postgres:
+    image: ambientum/postgres:9.6
+    container_name: study-project-postgres
+    volumes:
+      - study-project-postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=study-project
+      - POSTGRES_DB=study-project
+      - POSTGRES_USER=study-project
+
+  # MySQL (5.7)
+  mysql:
+    image: ambientum/mysql:5.7
+    container_name: study-project-mysql
+    volumes:
+      - study-project-mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=study-project
+      - MYSQL_DATABASE=study-project
+      - MYSQL_USER=study-project
+      - MYSQL_PASSWORD=study-project
+
+  # Redis
+  cache:
+    image: ambientum/redis:3.2
+    container_name: study-project-redis
+    command: --appendonly yes
+    volumes:
+      - study-project-redis-data:/data
+    ports:
+      - "6379:6379"
+
+  # PHP (with Caddy)
+  app:
+    image: ambientum/php:7.1-nginx
+    container_name: study-project-app
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "80:8080"
+    links:
+      - postgres
+      - mysql
+      - cache
+
+  # Laravel Queues
+  queue:
+    image: ambientum/php:7.1
+    container_name: study-project-queue
+    command: php artisan queue:listen
+    volumes:
+      - .:/var/www/app
+    links:
+      - mysql
+      - cache
