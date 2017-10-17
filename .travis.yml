@@ -4,9 +4,19 @@ os:
 language: php
 
 php:
-  - '7.0'
   - '7.1'
   
+env:
+  global:
+    - setup=basic
+    - APP_ENV=staging
+    - APP_DEBUG=true
+    - APP_KEY=xxxx
+    - DB_CONNECTION=sqlite
+    - CACHE_DRIVER=file
+    - SESSION_DRIVER=file
+    - QUEUE_DRIVER=sync  
+    
 before_script:
   - composer self-update
   - composer install --no-interaction
