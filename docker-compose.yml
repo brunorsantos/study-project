@@ -58,7 +58,7 @@ services:
     ports:
       - "6379:6379"
 
-  # PHP (with Caddy)
+  # PHP (with nginx)
   app:
     image: ambientum/php:7.1-nginx
     container_name: study-project-app
